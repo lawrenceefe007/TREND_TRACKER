@@ -8,7 +8,7 @@ from statsmodels.tsa.statespace.sarimax import SARIMAXResults
 
 # Load models
 xgb_model = joblib.load("model_xgb.pkl")
-lstm_model = load_model("model_lstm.h5")
+lstm_model = load_model("model_lstm.h5", compile=False)
 scaler = joblib.load("scaler_lstm.pkl")
 sarimax_model = SARIMAXResults.load("sarimax_model.pkl")
 
