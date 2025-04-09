@@ -12,10 +12,9 @@ lstm_model = load_model("model_lstm.h5", compile=False)
 scaler = joblib.load("scaler_lstm.pkl")
 sarimax_model = SARIMAXResults.load("sarimax_model.pkl")
 
-# Feature list (must match training)
-features = ['High', 'Low', 'close_lag_1', 'Volume', 'entry_count',
-            'cumulative_negative', 'positive_price_ratio',
-            'cumulative_neutral', 'cumulative_positive', 'close_lag_10']
+# ✅ Correct feature list used for all models
+features = ['High', 'Low', 'Open', 'entry_count_ma', 'cumulative_negative',
+            'close_20_ma', 'close_50_ma', 'close_lag_5', 'close_lag_7', 'rolling_mean_10d']
 
 # App title
 st.title("📈 NAB.AX Stock Close Price Predictor")
@@ -37,7 +36,7 @@ if st.button("Predict"):
         st.success(f"📊 Predicted Close Price (XGBoost): {prediction:.2f}")
     
     elif model_choice == "LSTM":
-        # Create dummy sequence (repeat input to match LSTM window)
+        # Repeat input 60 times to simulate a time window
         sequence = pd.concat([input_df] * 60, ignore_index=True)
         scaled_seq = scaler.transform(sequence)
         X_lstm = scaled_seq[-60:, :-1].reshape(1, 60, -1)
@@ -51,6 +50,6 @@ if st.button("Predict"):
         st.success(f"📊 Predicted Close Price (LSTM): {close_price:.2f}")
     
     else:
-        # SARIMAX requires exogenous input
+        # SARIMAX with exogenous input
         sarimax_pred = sarimax_model.forecast(steps=1, exog=input_df)[0]
         st.success(f"📊 Predicted Close Price (SARIMAX): {sarimax_pred:.2f}")
